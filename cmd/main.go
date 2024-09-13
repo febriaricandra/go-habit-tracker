@@ -3,31 +3,27 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
+	"github.com/febriaricandra/go-habit-tracker/config"
 	"github.com/febriaricandra/go-habit-tracker/internal/database"
 	route "github.com/febriaricandra/go-habit-tracker/internal/http"
-	"github.com/joho/godotenv"
 )
 
 func main() {
 
+	// load config
+	cfg := config.LoadConfig()
+
 	//default port
 	defaultPort := "8080"
-	godotenv.Load(".env")
-	jwtSecret := os.Getenv("JWT_SECRET")
-
-	if jwtSecret == "" {
-		log.Fatal("JWT_SECRET is not set || you need to setup .env file")
-	}
 
 	//initialize database connection
-	database.Connect()
+	database.Connect(cfg)
 	database.Migrate()
 
 	//routing
 	mux := http.NewServeMux()
-	route.RegisterUserRoutes(mux)
+	route.AuthRoutes(mux)
 
 	//start server
 	srv := &http.Server{

@@ -7,19 +7,16 @@ import (
 	"gorm.io/gorm"
 
 	"fmt"
-	"os"
+
+	"github.com/febriaricandra/go-habit-tracker/config"
 )
 
 var Instance *gorm.DB
 var err error
 
-func Connect() {
+func Connect(cfg *config.AppConfig) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"),
+		cfg.DB_USER, cfg.DB_PASS, cfg.DB_HOST, cfg.DB_PORT, cfg.DB_NAME,
 	)
 
 	Instance, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
@@ -31,6 +28,6 @@ func Connect() {
 }
 
 func Migrate() {
-	Instance.AutoMigrate(&User{}, &Habit{}, &HabitLog{}, &UserHabit{})
+	Instance.AutoMigrate(&User{}, &Habit{}, &Activity{})
 	log.Println("Database Migration Completed...")
 }

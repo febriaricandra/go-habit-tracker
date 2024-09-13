@@ -2,9 +2,12 @@ package database
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type User struct {
+	gorm.Model
 	ID        int    `gorm:"primaryKey"`
 	Username  string `gorm:"unique"`
 	Password  string
@@ -13,6 +16,7 @@ type User struct {
 }
 
 type Habit struct {
+	gorm.Model
 	ID        int `gorm:"primaryKey"`
 	UserID    int
 	Name      string
@@ -21,19 +25,13 @@ type Habit struct {
 	UpdatedAt time.Time
 }
 
-type HabitLog struct {
+type Activity struct {
+	gorm.Model
 	ID        int `gorm:"primaryKey"`
 	HabitID   int
 	Completed bool
+	Note      string
 	Date      time.Time
-	CreatedAt time.Time
-	UpdatedAt time.Time
-}
-
-type UserHabit struct {
-	ID        int `gorm:"primaryKey"`
-	UserID    int
-	HabitID   int
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
