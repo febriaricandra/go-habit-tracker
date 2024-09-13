@@ -5,6 +5,7 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 
 	"fmt"
 
@@ -19,7 +20,9 @@ func Connect(cfg *config.AppConfig) {
 		cfg.DB_USER, cfg.DB_PASS, cfg.DB_HOST, cfg.DB_PORT, cfg.DB_NAME,
 	)
 
-	Instance, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	Instance, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}

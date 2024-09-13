@@ -5,16 +5,22 @@ import (
 	"net/http"
 
 	"github.com/febriaricandra/go-habit-tracker/internal/database"
+	services "github.com/febriaricandra/go-habit-tracker/internal/services/user"
 	"github.com/febriaricandra/go-habit-tracker/internal/utils"
 )
+
+var userService = services.UserService{}
 
 func GetUsersHandler(w http.ResponseWriter, r *http.Request) {
 	type Response struct {
 		Users []database.User `json:"users"`
 	}
 
-	var users []database.User
-	database.Instance.Find(&users)
+	users, err := userService.GetUsers()
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch users")
+		return
+	}
 
 	utils.RespondWithJSON(w, http.StatusOK, Response{Users: users})
 }
@@ -29,6 +35,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		database.User
 	}
 
+	//decode the request body
 	var p Parameter
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&p)
@@ -37,23 +44,12 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if p.Username == "" || p.Password == "" {
-		utils.RespondWithError(w, http.StatusBadRequest, "Username or Password is missing")
-		return
-	}
-
-	hashedPassword, err := utils.HashPassword(p.Password)
+	//create the user
+	user, err := userService.CreateUser(p.Username, p.Password)
 	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, "Failed to hash password")
+		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	user := database.User{
-		Username: p.Username,
-		Password: hashedPassword,
-	}
-
-	database.Instance.Create(&user)
 
 	utils.RespondWithJSON(w, http.StatusCreated, Response{User: user})
 }
