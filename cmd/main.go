@@ -7,6 +7,7 @@ import (
 	"github.com/febriaricandra/go-habit-tracker/config"
 	"github.com/febriaricandra/go-habit-tracker/internal/database"
 	route "github.com/febriaricandra/go-habit-tracker/internal/http"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -24,11 +25,19 @@ func main() {
 	//routing
 	mux := http.NewServeMux()
 	route.AuthRoutes(mux)
+	route.PublicRoutes(mux)
+
+	//CORS middleware
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Content-Type", "Authorization"},
+	}).Handler(mux)
 
 	//start server
 	srv := &http.Server{
 		Addr:    ":" + defaultPort,
-		Handler: mux,
+		Handler: corsHandler,
 	}
 
 	log.Printf("Server started on port %s", defaultPort)

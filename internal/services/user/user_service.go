@@ -52,3 +52,15 @@ func (s *UserService) CreateUser(username, password string) (database.User, erro
 	err = database.Instance.Create(&user).Error
 	return user, err
 }
+
+func (s *UserService) GetUser(username string) (database.User, error) {
+	var user database.User
+	err := database.Instance.Where("username = ?", username).First(&user).Error
+	return user, err
+}
+
+func (s *UserService) GetUserByID(id string) (database.User, error) {
+	var user database.User
+	err := database.Instance.Where("id = ?", id).First(&user).Error
+	return user, err
+}

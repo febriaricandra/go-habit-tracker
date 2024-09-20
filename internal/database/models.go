@@ -10,7 +10,7 @@ type User struct {
 	gorm.Model
 	ID        int    `gorm:"primaryKey"`
 	Username  string `gorm:"unique"`
-	Password  string
+	Password  string `json:"-"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
